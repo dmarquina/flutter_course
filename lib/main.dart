@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import './product_manager.dart';
+import './product_control.dart';
 
 void main() {
 //  debugPaintSizeEnabled = true;
@@ -8,6 +9,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final Widget productManager = ProductManager();
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +19,11 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-          appBar: AppBar(
-            title: Text('Flutter Course lml'),
-          ),
-          body: ProductManager()
+        appBar: AppBar(
+          title: Text('Flutter Course lml'),
+        ),
+        body: productManager,
+        floatingActionButton: ProductControl(productManager),
       ),
     );
   }
