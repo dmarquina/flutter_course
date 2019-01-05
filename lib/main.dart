@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter_course/pages/home.dart';
 import './product_manager.dart';
-import './product_control.dart';
+
 
 void main() {
 //  debugPaintSizeEnabled = true;
@@ -18,13 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Flutter Course lml'),
-        ),
-        body: productManager,
-        floatingActionButton: ProductControl(productManager),
-      ),
+      home: HomePage(),
     );
   }
 }

@@ -9,10 +9,11 @@ class ProductControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-        onPressed: () {
-          productManager.addProducts('holi');
-        },
-        child: Icon(Icons.add),
+      onPressed: () {
+        productManager
+            .addProducts({'title': 'Chocolate', 'image': 'assets/food.jpg'});
+      },
+      child: Icon(Icons.add),
       elevation: 2.0,
     );
   }
