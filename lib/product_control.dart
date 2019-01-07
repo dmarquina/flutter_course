@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_course/product_manager.dart';
 
 class ProductControl extends StatelessWidget {
-  final ProductManager productManager;
+  final Function addProducts;
 
-  ProductControl(this.productManager);
+  ProductControl(this.addProducts);
 
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton(
+    return RaisedButton(
+      child: Text('Añadir producto'),
+      color: Theme.of(context).primaryColor,
+      textColor: Colors.white,
       onPressed: () {
-        productManager
-            .addProducts({'title': 'Chocolate', 'image': 'assets/food.jpg'});
+        addProducts({'title': 'Chocolate', 'image': 'assets/food.jpg'});
       },
-      child: Icon(Icons.add),
       elevation: 2.0,
     );
   }
