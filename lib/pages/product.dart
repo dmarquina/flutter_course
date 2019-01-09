@@ -7,6 +7,32 @@ class ProductPage extends StatelessWidget {
 
   ProductPage(this.title, this.imageUrl);
 
+  _showWarningDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('¿Estas seguro?'),
+            content: Text('Esta accón es permanente'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('NO'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text('SI'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context, true);
+                },
+              )
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -26,10 +52,12 @@ class ProductPage extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(10.0),
                 child: RaisedButton(
-                  color: Theme.of(context).primaryColor,
+                  color: Theme
+                      .of(context)
+                      .primaryColor,
                   textColor: Colors.white,
                   child: Text('DELETE'),
-                  onPressed: () => Navigator.pop(context, true),
+                  onPressed: () => _showWarningDialog(context),
                 ),
               )
             ],
