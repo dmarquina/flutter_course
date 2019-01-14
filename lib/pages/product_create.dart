@@ -12,9 +12,9 @@ class ProductCreatePage extends StatefulWidget {
 }
 
 class _ProductCreatePageState extends State<ProductCreatePage> {
-  String title = '';
-  String description = '';
-  double price;
+  String _title = '';
+  String _description = '';
+  double _price;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
             decoration: InputDecoration(labelText: 'Nombre'),
             onChanged: (String value) {
               setState(() {
-                title = value;
+                _title = value;
               });
             },
           ),
@@ -35,7 +35,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
             maxLines: 4,
             onChanged: (String value) {
               setState(() {
-                description = value;
+                _description = value;
               });
             },
           ),
@@ -44,24 +44,26 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
             keyboardType: TextInputType.number,
             onChanged: (String value) {
               setState(() {
-                price = double.parse(value);
+                _price = double.parse(value);
               });
             },
           ),
+          SizedBox(
+            height: 10.0,
+          ),
           RaisedButton(
             child: Text('Guardar'),
-            color: Theme
-                .of(context)
-                .primaryColor,
+            color: Theme.of(context).primaryColor,
             textColor: Colors.white,
             onPressed: () {
               final Map<String, dynamic> product = {
-                'title': title,
-                'description': description,
-                'price': price,
+                'title': _title,
+                'description': _description,
+                'price': _price,
                 'image': 'assets/food.jpg'
               };
               widget.addProduct(product);
+              Navigator.pushReplacementNamed(context, '/products');
             },
           )
         ],

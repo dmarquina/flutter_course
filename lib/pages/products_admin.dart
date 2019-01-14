@@ -7,7 +7,6 @@ class ProductsAdminPage extends StatelessWidget {
   final Function addProduct;
   final Function deleteProduct;
 
-
   ProductsAdminPage(this.addProduct, this.deleteProduct);
 
   @override
@@ -24,7 +23,7 @@ class ProductsAdminPage extends StatelessWidget {
               ),
               ListTile(
                 title: Text('Todos los productos'),
-                onTap: () => Navigator.pushReplacementNamed(context, '/'),
+                onTap: () => Navigator.pushReplacementNamed(context, '/products'),
               )
             ],
           ),
@@ -36,8 +35,7 @@ class ProductsAdminPage extends StatelessWidget {
             Tab(icon: Icon(Icons.list), text: 'Mis productos')
           ]),
         ),
-        body: TabBarView(
-            children: <Widget>[ProductCreatePage(addProduct), ProductListPage()]),
+        body: TabBarView(children: <Widget>[ProductCreatePage(addProduct), ProductListPage()]),
       ),
     );
   }
