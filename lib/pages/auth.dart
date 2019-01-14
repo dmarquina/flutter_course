@@ -20,45 +20,54 @@ class _AuthPageState extends State<AuthPage> {
           title: Text('Bienvenido'),
         ),
         body: Container(
-          margin: EdgeInsets.all(10.0),
-          child: ListView(children: <Widget>[
-            TextField(
-              decoration: InputDecoration(labelText: 'Correo'),
-              keyboardType: TextInputType.emailAddress,
-              onChanged: (String value) {
-                setState(() {
-                  _email = value;
-                });
-              },
-            ),
-            TextField(
-                decoration: InputDecoration(labelText: 'Contraseña'),
-                obscureText: true,
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.dstATop),
+                  image: AssetImage('assets/background.jpg'))),
+          padding: EdgeInsets.all(10.0),
+          child: Center(
+            child: SingleChildScrollView(
+                child: Column(children: <Widget>[
+              TextField(
+                decoration: InputDecoration(labelText: 'Correo',filled: true, fillColor: Colors.white),
+                keyboardType: TextInputType.emailAddress,
                 onChanged: (String value) {
                   setState(() {
-                    _password = value;
+                    _email = value;
                   });
-                }),
-            SwitchListTile(
-              value: _acceptTerms,
-              onChanged: (bool value) {
-                setState(() {
-                  _acceptTerms = value;
-                });
-              },
-              title: Text('Aceptar Términos'),
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            RaisedButton(
-                child: Text('INGRESAR'),
-                color: Theme.of(context).primaryColor,
-                textColor: Colors.white,
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/products');
-                }),
-          ]),
+                },
+              ),
+              SizedBox(height:10.0),
+              TextField(
+                  decoration: InputDecoration(labelText: 'Contraseña',filled: true, fillColor: Colors.white),
+                  obscureText: true,
+                  onChanged: (String value) {
+                    setState(() {
+                      _password = value;
+                    });
+                  }),
+              SwitchListTile(
+                value: _acceptTerms,
+                onChanged: (bool value) {
+                  setState(() {
+                    _acceptTerms = value;
+                  });
+                },
+                title: Text('Aceptar Términos', ),
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              RaisedButton(
+                  child: Text('INGRESAR'),
+                  color: Theme.of(context).primaryColor,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/products');
+                  }),
+            ])),
+          ),
         ));
   }
 }
