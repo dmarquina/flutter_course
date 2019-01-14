@@ -1,11 +1,31 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 
-class ProductPage extends StatelessWidget {
-  final String title;
-  final String imageUrl;
+import 'package:flutter/material.dart';
+import '../widgets/products/address_tag.dart';
 
-  ProductPage(this.title, this.imageUrl);
+import '../widgets/products/price_tag.dart';
+import '../widgets/ui_elements/title_default.dart';
+
+class ProductPage extends StatelessWidget {
+  final Map<String, dynamic> product;
+
+  ProductPage(this.product);
+
+  Widget _buildTitlePriceRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        Expanded(child: TitleDefault(product['title'])),
+        SizedBox(
+          width: 8.0,
+        ),
+        PriceTag(product['price'].toString()),
+        SizedBox(
+          width: 8.0,
+        ),
+      ],
+    );
+  }
 
   _showWarningDialog(BuildContext context) {
     showDialog(
@@ -42,24 +62,36 @@ class ProductPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(title),
+          title: Text(product['title']),
         ),
         body: Center(
           child: Column(
             children: <Widget>[
-              Image.asset(imageUrl),
-              Container(padding: EdgeInsets.all(10.0), child: Text(title)),
+              Image.asset(product['image']),
               Container(
-                padding: EdgeInsets.all(10.0),
-                child: RaisedButton(
-                  color: Theme
-                      .of(context)
-                      .primaryColor,
-                  textColor: Colors.white,
-                  child: Text('DELETE'),
+                  padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                  child: _buildTitlePriceRow()),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                child: AddressTag('Calle Buenos Aires, Stone Bridge'),
+              ),
+              SizedBox(
+                height: 8.0,
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                child: Text(product['description']),
+                alignment: Alignment(-1.0, 0.0),
+              ),
+              Container(
+                alignment: Alignment(1.0, 0.0),
+                child: IconButton(
+                  icon: Icon(Icons.delete_forever),
+                  color: Colors.red,
+                  iconSize: 30.0,
                   onPressed: () => _showWarningDialog(context),
                 ),
-              )
+              ),
             ],
           ),
         ),
