@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../widgets/products/address_tag.dart';
 
+import '../models/product.dart';
+import '../widgets/products/address_tag.dart';
 import '../widgets/products/price_tag.dart';
 import '../widgets/ui_elements/title_default.dart';
 
 class ProductPage extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Product product;
 
   ProductPage(this.product);
 
@@ -15,11 +16,11 @@ class ProductPage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        Expanded(child: TitleDefault(product['title'])),
+        Expanded(child: TitleDefault(product.title)),
         SizedBox(
           width: 8.0,
         ),
-        PriceTag(product['price'].toString()),
+        PriceTag(product.price.toString()),
         SizedBox(
           width: 8.0,
         ),
@@ -62,12 +63,12 @@ class ProductPage extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(product['title']),
+          title: Text(product.title),
         ),
         body: Center(
           child: Column(
             children: <Widget>[
-              Image.asset(product['image']),
+              Image.asset(product.image),
               Container(
                   padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
                   child: _buildTitlePriceRow()),
@@ -80,7 +81,7 @@ class ProductPage extends StatelessWidget {
               ),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                child: Text(product['description']),
+                child: Text(product.description),
                 alignment: Alignment(-1.0, 0.0),
               ),
               Container(

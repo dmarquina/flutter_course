@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import './models/product.dart';
 import 'package:flutter_course/pages/auth.dart';
 import 'package:flutter_course/pages/product.dart';
 import 'package:flutter_course/pages/products.dart';
@@ -18,15 +19,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Map<String, dynamic>> _products = [];
+  List<Product> _products = [];
 
-  void _addProduct(Map<String, dynamic> product) {
+  void _addProduct(Product product) {
     setState(() {
       _products.add(product);
     });
   }
 
-  void _updateProduct(int index, Map<String, dynamic> product) {
+  void _updateProduct(int index, Product product) {
     setState(() {
       _products[index] = product;
     });

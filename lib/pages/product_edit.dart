@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import '../models/product.dart';
 import 'package:flutter_course/widgets/helpers/ensure-visible.dart';
 
 class ProductEditPage extends StatefulWidget {
   final Function addProduct;
   final Function updateProduct;
-  final Map<String, dynamic> product;
+  final Product product;
   final int productIndex;
 
   ProductEditPage({this.addProduct, this.updateProduct, this.product, this.productIndex});
@@ -33,7 +34,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
       child: TextFormField(
           focusNode: _titleFocusNode,
           decoration: InputDecoration(labelText: 'Nombre'),
-          initialValue: widget.product != null ? widget.product['title'] : '',
+          initialValue: widget.product != null ? widget.product.title : '',
           validator: (String value) {
             if (value.isEmpty || value.length < 5) {
               return 'Tìtulo requerido y debe tener 5+ caracteres';
@@ -51,7 +52,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
       child: TextFormField(
           focusNode: _descriptionFocusNode,
           decoration: InputDecoration(labelText: 'Descripción'),
-          initialValue: widget.product != null ? widget.product['description'] : '',
+          initialValue: widget.product != null ? widget.product.description : '',
           validator: (String value) {
             if (value.isEmpty || value.length < 10) {
               return 'Descripción requerida y debe tener 5+ caracteres';
@@ -70,7 +71,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
       child: TextFormField(
           focusNode: _priceFocusNode,
           decoration: InputDecoration(labelText: 'Precio'),
-          initialValue: widget.product != null ? widget.product['price'].toString() : '',
+          initialValue: widget.product != null ? widget.product.price.toString() : '',
           validator: (String value) {
             if (value.isEmpty || !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
               return 'Precio requerido y debe ser un número';
@@ -120,9 +121,19 @@ class _ProductEditPageState extends State<ProductEditPage> {
     }
     _formKey.currentState.save();
     if (widget.product != null) {
-      widget.updateProduct(widget.productIndex, _formData);
+      widget.updateProduct(
+          widget.productIndex,
+          Product(
+              title: _formData['title'],
+              description: _formData['description'],
+              price: _formData['price'],
+              image: _formData['image']));
     } else {
-      widget.addProduct(_formData);
+      widget.addProduct(Product(
+          title: _formData['title'],
+          description: _formData['description'],
+          price: _formData['price'],
+          image: _formData['image']));
     }
     Navigator.pushReplacementNamed(context, '/products');
   }
@@ -133,11 +144,11 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
     return widget.product != null
         ? Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Product'),
-      ),
-      body: pageContent,
-    )
+            appBar: AppBar(
+              title: Text('Edit Product'),
+            ),
+            body: pageContent,
+          )
         : pageContent;
   }
 }
