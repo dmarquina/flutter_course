@@ -1,26 +1,28 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_course/scoped-models/products.dart';
 
 import '../models/product.dart';
 import '../widgets/products/address_tag.dart';
 import '../widgets/products/price_tag.dart';
 import '../widgets/ui_elements/title_default.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class ProductPage extends StatelessWidget {
-  final Product product;
+  final int productIndex;
 
-  ProductPage(this.product);
+  ProductPage(this.productIndex);
 
-  Widget _buildTitlePriceRow() {
+  Widget _buildTitlePriceRow(String title,String price) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
-        Expanded(child: TitleDefault(product.title)),
+        Expanded(child: TitleDefault(title)),
         SizedBox(
           width: 8.0,
         ),
-        PriceTag(product.price.toString()),
+        PriceTag(price),
         SizedBox(
           width: 8.0,
         ),
@@ -57,46 +59,49 @@ class ProductPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () {
-        Navigator.pop(context, false);
-        return Future.value(false);
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(product.title),
-        ),
-        body: Center(
-          child: Column(
-            children: <Widget>[
-              Image.asset(product.image),
-              Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                  child: _buildTitlePriceRow()),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                child: AddressTag('Calle Buenos Aires, Stone Bridge'),
-              ),
-              SizedBox(
-                height: 8.0,
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                child: Text(product.description),
-                alignment: Alignment(-1.0, 0.0),
-              ),
-              Container(
-                alignment: Alignment(1.0, 0.0),
-                child: IconButton(
-                  icon: Icon(Icons.delete_forever),
-                  color: Colors.red,
-                  iconSize: 30.0,
-                  onPressed: () => _showWarningDialog(context),
+        onWillPop: () {
+          Navigator.pop(context, false);
+          return Future.value(false);
+        },
+        child: ScopedModelDescendant<ProductsModel>(
+            builder: (BuildContext context, Widget child, ProductsModel model) {
+              final Product product = model.products.elementAt(productIndex);
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text(product.title),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+                body: Center(
+                  child: Column(
+                    children: <Widget>[
+                      Image.asset(product.image),
+                      Container(
+                          padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                          child: _buildTitlePriceRow(product.title, product.price.toString())),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                        child: AddressTag('Calle Buenos Aires, Stone Bridge'),
+                      ),
+                      SizedBox(
+                        height: 8.0,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                        child: Text(product.description),
+                        alignment: Alignment(-1.0, 0.0),
+                      ),
+                      Container(
+                        alignment: Alignment(1.0, 0.0),
+                        child: IconButton(
+                          icon: Icon(Icons.delete_forever),
+                          color: Colors.red,
+                          iconSize: 30.0,
+                          onPressed: () => _showWarningDialog(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }));
   }
 }
