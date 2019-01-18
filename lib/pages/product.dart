@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_course/scoped-models/products.dart';
+import 'package:flutter_course/scoped-models/main.dart';
 
 import '../models/product.dart';
 import '../widgets/products/address_tag.dart';
@@ -63,9 +63,9 @@ class ProductPage extends StatelessWidget {
           Navigator.pop(context, false);
           return Future.value(false);
         },
-        child: ScopedModelDescendant<ProductsModel>(
-            builder: (BuildContext context, Widget child, ProductsModel model) {
-              final Product product = model.products.elementAt(productIndex);
+        child: ScopedModelDescendant<MainModel>(
+            builder: (BuildContext context, Widget child, MainModel model) {
+              final Product product = model.allProducts.elementAt(productIndex);
               return Scaffold(
                 appBar: AppBar(
                   title: Text(product.title),
