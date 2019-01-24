@@ -132,18 +132,31 @@ class _ProductEditPageState extends State<ProductEditPage> {
     _formKey.currentState.save();
     if (selectedProductIndex == -1) {
       addProduct(
-          _formData['title'],
-          _formData['description'],
-          _formData['image'],
-          _formData['price'])
-          .then((_) => Navigator.pushReplacementNamed(context, '/products')
-              .then((_) => setSelectedProduct(null)));
+              _formData['title'], _formData['description'], _formData['image'], _formData['price'])
+          .then((bool success) {
+        if (success) {
+          Navigator.pushReplacementNamed(context, '/products')
+              .then((_) => setSelectedProduct(null));
+        } else {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Ocurrió algo inesperado'),
+                  content: Text('Por favor intenta nuevamente.'),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Ok'),
+                    )
+                  ],
+                );
+              });
+        }
+      });
     } else {
       updateProduct(
-          _formData['title'],
-          _formData['description'],
-          _formData['image'],
-          _formData['price'])
+              _formData['title'], _formData['description'], _formData['image'], _formData['price'])
           .then((_) => Navigator.pushReplacementNamed(context, '/products')
               .then((_) => setSelectedProduct(null)));
     }
