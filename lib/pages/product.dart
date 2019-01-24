@@ -58,51 +58,55 @@ class ProductPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () {
-          Navigator.pop(context, false);
-          return Future.value(false);
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(product.title),
-          ),
-          body: Center(
-            child: Column(
-              children: <Widget>[
-                FadeInImage(
-                  image: NetworkImage(product.image),
-                  height: 300.0,
-                  fit: BoxFit.cover,
-                  placeholder: AssetImage('assets/image-loader.gif'),
-                ),
-                Container(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                    child: _buildTitlePriceRow(product.title, product.price.toString())),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                  child: AddressTag('Calle Buenos Aires, Stone Bridge'),
-                ),
-                SizedBox(
-                  height: 8.0,
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                  child: Text(product.description),
-                  alignment: Alignment(-1.0, 0.0),
-                ),
-                Container(
-                  alignment: Alignment(1.0, 0.0),
-                  child: IconButton(
-                    icon: Icon(Icons.delete_forever),
-                    color: Colors.red,
-                    iconSize: 30.0,
-                    onPressed: () => _showWarningDialog(context),
-                  ),
-                ),
-              ],
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return WillPopScope(
+          onWillPop: () {
+            Navigator.pop(context, false);
+            model.selectProduct(null);
+            return Future.value(false);
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(product.title),
             ),
-          ),
-        ));
+            body: Center(
+              child: Column(
+                children: <Widget>[
+                  FadeInImage(
+                    image: NetworkImage(product.image),
+                    height: 300.0,
+                    fit: BoxFit.cover,
+                    placeholder: AssetImage('assets/placeholder.png'),
+                  ),
+                  Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                      child: _buildTitlePriceRow(product.title, product.price.toString())),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                    child: AddressTag('Calle Buenos Aires, Stone Bridge'),
+                  ),
+                  SizedBox(
+                    height: 8.0,
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                    child: Text(product.description),
+                    alignment: Alignment(-1.0, 0.0),
+                  ),
+                  Container(
+                    alignment: Alignment(1.0, 0.0),
+                    child: IconButton(
+                      icon: Icon(Icons.delete_forever),
+                      color: Colors.red,
+                      iconSize: 30.0,
+                      onPressed: () => _showWarningDialog(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ));
+    });
   }
 }

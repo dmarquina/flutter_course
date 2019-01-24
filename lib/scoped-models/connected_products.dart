@@ -12,41 +12,7 @@ mixin ConnectedProductsModel on Model {
   String _selProductId;
   bool _isLoading = false;
 
-  Future<bool> addProduct(String title, String description, String image, double price) {
-    _isLoading = true;
-    notifyListeners();
-    final Map<String, dynamic> productData = {
-      'title': title,
-      'description': description,
-      'image': 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Chocolate.jpg',
-      'price': price,
-      'userEmail': _authenticatedUser.email,
-      'userId': _authenticatedUser.id
-    };
-    return http
-        .post('https://flutter-products-cec1d.firebaseio.com/products',
-            body: json.encode(productData))
-        .then((res) {
-      if (res.statusCode != 200 && res.statusCode != 201) {
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
-      final Map<String, dynamic> responseData = json.decode(res.body);
-      final Product newProduct = new Product(
-          id: responseData['name'],
-          title: title,
-          description: description,
-          price: price,
-          image: image,
-          userEmail: _authenticatedUser.email,
-          userId: _authenticatedUser.id);
-      _products.add(newProduct);
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    });
-  }
+
 }
 
 mixin ProductsModel on ConnectedProductsModel {
@@ -71,7 +37,48 @@ mixin ProductsModel on ConnectedProductsModel {
     return _selProductId;
   }
 
-  Future<Null> updateProduct(String title, String description, String image, double price) {
+  Future<bool> addProduct(String title, String description, String image, double price) async {
+    _isLoading = true;
+    notifyListeners();
+    final Map<String, dynamic> productData = {
+      'title': title,
+      'description': description,
+      'image': 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Chocolate.jpg',
+      'price': price,
+      'userEmail': _authenticatedUser.email,
+      'userId': _authenticatedUser.id
+    };
+    try {
+      final http.Response res = await http.post(
+          'https://flutter-products-cec1d.firebaseio.com/products.json',
+          body: json.encode(productData));
+
+      if (res.statusCode != 200 && res.statusCode != 201) {
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+      final Map<String, dynamic> responseData = json.decode(res.body);
+      final Product newProduct = new Product(
+          id: responseData['name'],
+          title: title,
+          description: description,
+          price: price,
+          image: image,
+          userEmail: _authenticatedUser.email,
+          userId: _authenticatedUser.id);
+      _products.add(newProduct);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> updateProduct(String title, String description, String image, double price) {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> updateData = {
@@ -97,10 +104,15 @@ mixin ProductsModel on ConnectedProductsModel {
       _products[selectedProductIndex] = updateProduct;
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((onError) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
   }
 
-  Future<Null> deleteProduct() {
+  Future<bool> deleteProduct() {
     _isLoading = true;
     final deletedProductId = selectedProduct.id;
 
@@ -111,13 +123,21 @@ mixin ProductsModel on ConnectedProductsModel {
         .then((res) {
       _isLoading = false;
       notifyListeners();
+      return true;
+    }).catchError((onError) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     });
+    ;
   }
 
   Future<Null> fetchProducts() {
     _isLoading = true;
     notifyListeners();
-    return http.get('https://flutter-products-cec1d.firebaseio.com/products.json').then((res) {
+    return http
+        .get('https://flutter-products-cec1d.firebaseio.com/products.json')
+        .then<Null>((res) {
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(res.body);
       if (productListData == null) {
@@ -140,6 +160,9 @@ mixin ProductsModel on ConnectedProductsModel {
       _isLoading = false;
       notifyListeners();
       _selProductId = null;
+    }).catchError((onError) {
+      _isLoading = false;
+      notifyListeners();
     });
   }
 
