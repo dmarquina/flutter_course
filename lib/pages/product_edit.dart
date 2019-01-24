@@ -130,18 +130,20 @@ class _ProductEditPageState extends State<ProductEditPage> {
       return;
     }
     _formKey.currentState.save();
-    if (selectedProductIndex != null) {
-      updateProduct(
-              _formData['title'],
-              _formData['description'],
-              _formData['image'],
-              _formData['price'])
+    if (selectedProductIndex == -1) {
+      addProduct(
+          _formData['title'],
+          _formData['description'],
+          _formData['image'],
+          _formData['price'])
           .then((_) => Navigator.pushReplacementNamed(context, '/products')
               .then((_) => setSelectedProduct(null)));
-      ;
     } else {
-      addProduct(
-              _formData['title'], _formData['description'], _formData['image'], _formData['price'])
+      updateProduct(
+          _formData['title'],
+          _formData['description'],
+          _formData['image'],
+          _formData['price'])
           .then((_) => Navigator.pushReplacementNamed(context, '/products')
               .then((_) => setSelectedProduct(null)));
     }
@@ -152,14 +154,14 @@ class _ProductEditPageState extends State<ProductEditPage> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       final Widget pageContent = _buildPageContent(context, model.selectedProduct);
-      return model.selectedProductIndex != null
-          ? Scaffold(
+      return model.selectedProductIndex == -1
+          ? pageContent
+          : Scaffold(
               appBar: AppBar(
                 title: Text('Edit Product'),
               ),
               body: pageContent,
-            )
-          : pageContent;
+            );
     });
   }
 }

@@ -28,28 +28,29 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    return ButtonBar(
-      alignment: MainAxisAlignment.center,
-      children: <Widget>[
-        IconButton(
-          icon: Icon(Icons.info_outline, color: Theme.of(context).primaryColor),
-          onPressed: () =>
-              Navigator.pushNamed<bool>(context, '/product/' + productIndex.toString()),
-        ),
-        ScopedModelDescendant<MainModel>(
-            builder: (BuildContext context, Widget child, MainModel model) {
-          return IconButton(
-            icon: Icon(
-              model.allProducts[productIndex].isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: Colors.red,
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        return ButtonBar(
+          alignment: MainAxisAlignment.center,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.info_outline, color: Theme.of(context).primaryColor),
+              onPressed: () =>
+                  Navigator.pushNamed<bool>(context, '/product/' + model.allProducts[productIndex].id),
             ),
-            onPressed: () {
-              model.selectProduct(productIndex);
-              model.toggleProductFavoriteStatus();
-            },
-          );
-        }),
-      ],
+            IconButton(
+              icon: Icon(
+                model.allProducts[productIndex].isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: Colors.red,
+              ),
+              onPressed: () {
+                model.selectProduct(model.allProducts[productIndex].id);
+                model.toggleProductFavoriteStatus();
+              },
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -63,7 +64,7 @@ class ProductCard extends StatelessWidget {
             image: NetworkImage(product.image),
             height: 300.0,
             fit: BoxFit.cover,
-            placeholder: AssetImage('assets/background.jpg'),
+            placeholder: AssetImage('assets/image-loader.gif'),
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 5.0),

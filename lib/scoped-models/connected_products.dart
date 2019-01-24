@@ -9,7 +9,7 @@ import 'dart:async';
 mixin ConnectedProductsModel on Model {
   List<Product> _products = [];
   User _authenticatedUser;
-  int _selProductIndex;
+  String _selProductId;
   bool _isLoading = false;
 
   Future<Null> addProduct(String title, String description, String image, double price) {
@@ -56,7 +56,13 @@ mixin ProductsModel on ConnectedProductsModel {
   }
 
   int get selectedProductIndex {
-    return _selProductIndex;
+    return _products.indexWhere((Product product) {
+      return product.id == _selProductId;
+    });
+  }
+
+  String get selectedProductId {
+    return _selProductId;
   }
 
   Future<Null> updateProduct(String title, String description, String image, double price) {
@@ -91,10 +97,11 @@ mixin ProductsModel on ConnectedProductsModel {
   Future<Null> deleteProduct() {
     _isLoading = true;
     final deletedProductId = selectedProduct.id;
+
     _products.removeAt(selectedProductIndex);
-    _selProductIndex = null;
-    return http.delete(
-            'https://flutter-products-cec1d.firebaseio.com/products/$deletedProductId.json/')
+    _selProductId = null;
+    return http
+        .delete('https://flutter-products-cec1d.firebaseio.com/products/$deletedProductId.json/')
         .then((res) {
       _isLoading = false;
       notifyListeners();
@@ -130,8 +137,10 @@ mixin ProductsModel on ConnectedProductsModel {
   }
 
   Product get selectedProduct {
-    if (selectedProductIndex != null) {
-      return _products[selectedProductIndex];
+    if (selectedProductId != null) {
+      return _products.firstWhere((Product product) {
+        return product.id == _selProductId;
+      });
     } else {
       return null;
     }
@@ -145,7 +154,7 @@ mixin ProductsModel on ConnectedProductsModel {
     final bool isCurrentlyFavorite = _products[selectedProductIndex].isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
     final Product updatedProduct = Product(
-      id: '',
+      id: selectedProduct.id,
       title: selectedProduct.title,
       description: selectedProduct.description,
       price: selectedProduct.price,
@@ -158,8 +167,9 @@ mixin ProductsModel on ConnectedProductsModel {
     notifyListeners();
   }
 
-  void selectProduct(int index) {
-    _selProductIndex = index;
+  void selectProduct(String productId) {
+    _selProductId = productId;
+    notifyListeners();
   }
 
 //  void selectProduct(String productId) {

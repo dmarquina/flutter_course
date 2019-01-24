@@ -10,11 +10,11 @@ import '../widgets/ui_elements/title_default.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductPage extends StatelessWidget {
-  final int productIndex;
+  final Product product;
 
-  ProductPage(this.productIndex);
+  ProductPage(this.product);
 
-  Widget _buildTitlePriceRow(String title,String price) {
+  Widget _buildTitlePriceRow(String title, String price) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -63,45 +63,46 @@ class ProductPage extends StatelessWidget {
           Navigator.pop(context, false);
           return Future.value(false);
         },
-        child: ScopedModelDescendant<MainModel>(
-            builder: (BuildContext context, Widget child, MainModel model) {
-              final Product product = model.allProducts.elementAt(productIndex);
-              return Scaffold(
-                appBar: AppBar(
-                  title: Text(product.title),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(product.title),
+          ),
+          body: Center(
+            child: Column(
+              children: <Widget>[
+                FadeInImage(
+                  image: NetworkImage(product.image),
+                  height: 300.0,
+                  fit: BoxFit.cover,
+                  placeholder: AssetImage('assets/image-loader.gif'),
                 ),
-                body: Center(
-                  child: Column(
-                    children: <Widget>[
-                      Image.network(product.image),
-                      Container(
-                          padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                          child: _buildTitlePriceRow(product.title, product.price.toString())),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                        child: AddressTag('Calle Buenos Aires, Stone Bridge'),
-                      ),
-                      SizedBox(
-                        height: 8.0,
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                        child: Text(product.description),
-                        alignment: Alignment(-1.0, 0.0),
-                      ),
-                      Container(
-                        alignment: Alignment(1.0, 0.0),
-                        child: IconButton(
-                          icon: Icon(Icons.delete_forever),
-                          color: Colors.red,
-                          iconSize: 30.0,
-                          onPressed: () => _showWarningDialog(context),
-                        ),
-                      ),
-                    ],
+                Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                    child: _buildTitlePriceRow(product.title, product.price.toString())),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                  child: AddressTag('Calle Buenos Aires, Stone Bridge'),
+                ),
+                SizedBox(
+                  height: 8.0,
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
+                  child: Text(product.description),
+                  alignment: Alignment(-1.0, 0.0),
+                ),
+                Container(
+                  alignment: Alignment(1.0, 0.0),
+                  child: IconButton(
+                    icon: Icon(Icons.delete_forever),
+                    color: Colors.red,
+                    iconSize: 30.0,
+                    onPressed: () => _showWarningDialog(context),
                   ),
                 ),
-              );
-            }));
+              ],
+            ),
+          ),
+        ));
   }
 }
