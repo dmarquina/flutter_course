@@ -114,27 +114,37 @@ class _ProductEditPageState extends State<ProductEditPage> {
   Widget _buildSubmitButton() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      return RaisedButton(
-          child: Text('Guardar'),
-          textColor: Colors.white,
-          onPressed: () =>
-              _submitForm(model.addProduct, model.updateProduct, model.selectProduct, model.selectedProductIndex));
+      return model.isLoading
+          ? Center(child: CircularProgressIndicator())
+          : RaisedButton(
+              child: Text('Guardar'),
+              textColor: Colors.white,
+              onPressed: () => _submitForm(model.addProduct, model.updateProduct,
+                  model.selectProduct, model.selectedProductIndex));
     });
   }
 
-  _submitForm(Function addProduct, Function updateProduct, Function setSelectedProduct, [int selectedProductIndex]) {
+  _submitForm(Function addProduct, Function updateProduct, Function setSelectedProduct,
+      [int selectedProductIndex]) {
     if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
     if (selectedProductIndex != null) {
       updateProduct(
-          _formData['title'], _formData['description'], _formData['image'], _formData['price']);
+              _formData['title'],
+              _formData['description'],
+              _formData['image'],
+              _formData['price'])
+          .then((_) => Navigator.pushReplacementNamed(context, '/products')
+              .then((_) => setSelectedProduct(null)));
+      ;
     } else {
       addProduct(
-          _formData['title'], _formData['description'], _formData['image'], _formData['price']);
+              _formData['title'], _formData['description'], _formData['image'], _formData['price'])
+          .then((_) => Navigator.pushReplacementNamed(context, '/products')
+              .then((_) => setSelectedProduct(null)));
     }
-    Navigator.pushReplacementNamed(context, '/products').then((_) => setSelectedProduct(null)) ;
   }
 
   @override

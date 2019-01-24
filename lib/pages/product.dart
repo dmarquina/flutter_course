@@ -73,7 +73,7 @@ class ProductPage extends StatelessWidget {
                 body: Center(
                   child: Column(
                     children: <Widget>[
-                      Image.asset(product.image),
+                      Image.network(product.image),
                       Container(
                           padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
                           child: _buildTitlePriceRow(product.title, product.price.toString())),

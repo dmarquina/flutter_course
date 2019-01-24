@@ -21,8 +21,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+    final MainModel model = MainModel();
     return ScopedModel<MainModel>(
-      model: MainModel(),
+      model: model,
       child: MaterialApp(
       title: 'Flutter baby',
       debugShowCheckedModeBanner: true,
@@ -33,9 +34,9 @@ class _MyAppState extends State<MyApp> {
 //      home: AuthPage(),
       routes: {
         '/': (BuildContext context) => AuthPage(),
-        '/products': (BuildContext context) => ProductsPage(),
+        '/products': (BuildContext context) => ProductsPage(model),
         '/admin': (BuildContext context) =>
-            ProductsAdminPage(),
+            ProductsAdminPage(model),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
@@ -50,7 +51,7 @@ class _MyAppState extends State<MyApp> {
         return null;
       },
       onUnknownRoute: (RouteSettings settings) {
-        return MaterialPageRoute(builder: (BuildContext context) => ProductsPage());
+        return MaterialPageRoute(builder: (BuildContext context) => ProductsPage(model));
       },
     ),);
   }

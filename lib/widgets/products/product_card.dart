@@ -27,7 +27,7 @@ class ProductCard extends StatelessWidget {
         ));
   }
 
-  Widget _buildAcctionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context) {
     return ButtonBar(
       alignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -59,11 +59,23 @@ class ProductCard extends StatelessWidget {
       elevation: 3.0,
       child: Column(
         children: <Widget>[
-          Image.asset(product.image),
-          _buildTitlePriceRow(),
-          AddressTag('Calle Buenos Aires, Stone Bridge'),
-          Text(product.userEmail),
-          _buildAcctionButtons(context)
+          FadeInImage(
+            image: NetworkImage(product.image),
+            height: 300.0,
+            fit: BoxFit.cover,
+            placeholder: AssetImage('assets/background.jpg'),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: <Widget>[
+                _buildTitlePriceRow(),
+                AddressTag('Calle Buenos Aires, Stone Bridge'),
+                Text(product.userEmail),
+                _buildActionButtons(context),
+              ],
+            ),
+          )
         ],
       ),
     );
