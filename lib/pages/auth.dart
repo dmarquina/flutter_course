@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_course/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+enum AuthMode { Signup, Login }
+
 class AuthPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -12,6 +14,8 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> {
   final Map<String, dynamic> _formData = {'email': null, 'password': null, 'acceptTerms': false};
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _passwordTextController = TextEditingController();
+  AuthMode _authMode = AuthMode.Login;
 
   DecorationImage _buildBackgroundImage() {
     return DecorationImage(
@@ -39,6 +43,7 @@ class _AuthPageState extends State<AuthPage> {
     return TextFormField(
         decoration: InputDecoration(labelText: 'Contraseña', filled: true, fillColor: Colors.white),
         obscureText: true,
+        controller: _passwordTextController,
         validator: (String value) {
           if (value.isEmpty) {
             return 'La contraseña debe contener como mínimo 5 caracteres';
@@ -47,6 +52,20 @@ class _AuthPageState extends State<AuthPage> {
         onSaved: (String value) {
           _formData['password'] = value;
         });
+  }
+
+  Widget _buildPasswordConfirmTextField() {
+    return TextFormField(
+      decoration:
+          InputDecoration(labelText: 'Confirmar contraseña', filled: true, fillColor: Colors.white),
+      obscureText: true,
+      validator: (String value) {
+        if (_passwordTextController.text != value) {
+          return 'Las contraseñas no son iguales';
+        }
+      },
+      onSaved: (String value) {},
+    );
   }
 
   Widget _buildAcceptSwitch() {
@@ -63,7 +82,7 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _submitForm(Function login) {
+  void _submitForm(Function login, Function signup) async {
     if (!_formKey.currentState.validate()) {
       return;
     }
@@ -71,8 +90,32 @@ class _AuthPageState extends State<AuthPage> {
       return;
     }
     _formKey.currentState.save();
-    login(_formData['email'], _formData['password']);
-    Navigator.pushReplacementNamed(context, '/products');
+    if (_authMode == AuthMode.Login) {
+      login(_formData['email'], _formData['password']);
+    } else {
+      final Map<String, dynamic> successInformation =
+          await signup(_formData['email'], _formData['password']);
+      if (successInformation['success']) {
+        Navigator.pushReplacementNamed(context, '/products');
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Ocurrió un error'),
+                content: Text(successInformation['message']),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('Ok'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              );
+            });
+      }
+    }
   }
 
   @override
@@ -98,18 +141,29 @@ class _AuthPageState extends State<AuthPage> {
                   _buildEmailTextField(),
                   SizedBox(height: 10.0),
                   _buildPasswordTextField(),
+                  SizedBox(height: 10.0),
+                  _authMode == AuthMode.Signup ? _buildPasswordConfirmTextField() : Container(),
                   _buildAcceptSwitch(),
+                  SizedBox(height: 10.0),
+                  FlatButton(
+                    child:
+                        Text('${_authMode == AuthMode.Login ? 'Registrarse' : 'Iniciar sesión'}'),
+                    onPressed: () {
+                      setState(() {
+                        _authMode = _authMode == AuthMode.Login ? AuthMode.Signup : AuthMode.Login;
+                      });
+                    },
+                  ),
                   SizedBox(
                     height: 10.0,
                   ),
                   ScopedModelDescendant<MainModel>(
-                      builder: (BuildContext context, Widget child, MainModel model) {
-                    return RaisedButton(
-                        child: Text('INGRESAR'),
-                        textColor: Colors.white,
-                        onPressed: () => _submitForm(model.login)
-                    );
-                  },
+                    builder: (BuildContext context, Widget child, MainModel model) {
+                      return RaisedButton(
+                          child: Text('INGRESAR'),
+                          textColor: Colors.white,
+                          onPressed: () => _submitForm(model.login, model.signup));
+                    },
                   )
                 ]),
               )),
