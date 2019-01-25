@@ -5,6 +5,7 @@ import 'package:flutter_course/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
 import 'dart:async';
+import '../models/auth.dart';
 
 mixin ConnectedProductsModel on Model {
   List<Product> _products = [];
@@ -213,30 +214,44 @@ mixin ProductsModel on ConnectedProductsModel {
 }
 
 mixin UserModel on ConnectedProductsModel {
-  void login(String email, String password) {
-    _authenticatedUser = User(id: 'asdfadsf', email: email, password: password);
-  }
-
-  Future<Map<String, dynamic>> signup(String email, String password) async {
+  Future<Map<String, dynamic>> authenticate(String email, String password,
+      [AuthMode mode = AuthMode.Login]) async {
+    _isLoading = true;
+    notifyListeners();
     final Map<String, dynamic> authData = {
       'email': email,
       'password': password,
       'returnSecureToken': true
     };
-    final http.Response res = await http.post(
-        'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyByC8BXowrV9hIW8N-NDfmRtpjp2Xh95Pc',
-        body: json.encode(authData),
-        headers: {'Content-Type': 'application/json'});
-    print(json.decode(res.body));
+    http.Response res;
+    if (mode == AuthMode.Login) {
+      res = await http.post(
+          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyByC8BXowrV9hIW8N-NDfmRtpjp2Xh95Pc',
+          body: json.encode(authData),
+          headers: {'Content-Type': 'application/json'});
+    } else {
+      res = await http.post(
+          'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyByC8BXowrV9hIW8N-NDfmRtpjp2Xh95Pc',
+          body: json.encode(authData),
+          headers: {'Content-Type': 'application/json'});
+    }
+
     final Map<String, dynamic> responseData = json.decode(res.body);
     bool hasError = true;
     String message = 'Ocurrió un error';
     if (responseData.containsKey('idToken')) {
       hasError = false;
-      message = 'Autenticación exitosa';
+      message = 'Autenticación exitosa.';
+    } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
+      message = 'Este correo no fue encontrado.';
+    } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
+      message = 'Contraseña inválida.';
     } else if (responseData['error']['message'] == 'EMAIL_EXISTS') {
       message = 'Este correo ya existe';
     }
+    _isLoading = false;
+    notifyListeners();
+    _authenticatedUser = User(id: 'asdfadsf', email: email, password: password);
     return {'success': !hasError, 'message': message};
   }
 }
