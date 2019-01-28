@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:scoped_model/scoped_model.dart';
 import 'dart:async';
 import '../models/auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 mixin ConnectedProductsModel on Model {
   List<Product> _products = [];
@@ -49,7 +50,7 @@ mixin ProductsModel on ConnectedProductsModel {
     };
     try {
       final http.Response res = await http.post(
-          'https://flutter-products-cec1d.firebaseio.com/products.json',
+          'https://flutter-products-cec1d.firebaseio.com/products.json?auth=${_authenticatedUser.token}',
           body: json.encode(productData));
 
       if (res.statusCode != 200 && res.statusCode != 201) {
@@ -89,7 +90,8 @@ mixin ProductsModel on ConnectedProductsModel {
       'userId': selectedProduct.userId,
     };
     return http
-        .put('https://flutter-products-cec1d.firebaseio.com/products/${selectedProduct.id}.json/',
+        .put(
+            'https://flutter-products-cec1d.firebaseio.com/products/${selectedProduct.id}.json?auth=${_authenticatedUser.token}',
             body: json.encode(updateData))
         .then((res) {
       final Product updateProduct = new Product(
@@ -118,7 +120,8 @@ mixin ProductsModel on ConnectedProductsModel {
     _products.removeAt(selectedProductIndex);
     _selProductId = null;
     return http
-        .delete('https://flutter-products-cec1d.firebaseio.com/products/$deletedProductId.json/')
+        .delete(
+            'https://flutter-products-cec1d.firebaseio.com/products/$deletedProductId.json?auth=${_authenticatedUser.token}')
         .then((res) {
       _isLoading = false;
       notifyListeners();
@@ -135,7 +138,8 @@ mixin ProductsModel on ConnectedProductsModel {
     _isLoading = true;
     notifyListeners();
     return http
-        .get('https://flutter-products-cec1d.firebaseio.com/products.json')
+        .get(
+            'https://flutter-products-cec1d.firebaseio.com/products.json?auth=${_authenticatedUser.token}')
         .then<Null>((res) {
       final List<Product> fetchedProductList = [];
       final Map<String, dynamic> productListData = json.decode(res.body);
@@ -242,6 +246,12 @@ mixin UserModel on ConnectedProductsModel {
     if (responseData.containsKey('idToken')) {
       hasError = false;
       message = 'Autenticación exitosa.';
+      _authenticatedUser =
+          User(id: responseData['localId'], email: email, token: responseData['idToken']);
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', responseData['idToken']);
+      prefs.setString('userEmail', email);
+      prefs.setString('userId', responseData['localId']);
     } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
       message = 'Este correo no fue encontrado.';
     } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
@@ -251,8 +261,32 @@ mixin UserModel on ConnectedProductsModel {
     }
     _isLoading = false;
     notifyListeners();
-    _authenticatedUser = User(id: 'asdfadsf', email: email, password: password);
     return {'success': !hasError, 'message': message};
+  }
+
+  void autoAuthenticate() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token');
+    if (token != null) {
+      final String userEmail = prefs.getString('userEmail');
+      final String userId = prefs.getString('userId');
+      _authenticatedUser = User(id: userId, email: userEmail, token: token);
+      notifyListeners();
+    }
+  }
+
+  void logout() async {
+    _authenticatedUser = null;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('token');
+    prefs.remove('userEmail');
+    prefs.remove('userId');
+
+
+  }
+
+  User get user {
+    return _authenticatedUser;
   }
 }
 
