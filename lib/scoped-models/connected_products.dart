@@ -248,10 +248,14 @@ mixin UserModel on ConnectedProductsModel {
       message = 'Autenticación exitosa.';
       _authenticatedUser =
           User(id: responseData['localId'], email: email, token: responseData['idToken']);
+      setAuthTimeout(int.parse(responseData['expiresIn']));
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['idToken']);
       prefs.setString('userEmail', email);
       prefs.setString('userId', responseData['localId']);
+
+      prefs.setString('userId', responseData['localId']);
+
     } else if (responseData['error']['message'] == 'EMAIL_NOT_FOUND') {
       message = 'Este correo no fue encontrado.';
     } else if (responseData['error']['message'] == 'INVALID_PASSWORD') {
@@ -281,8 +285,10 @@ mixin UserModel on ConnectedProductsModel {
     prefs.remove('token');
     prefs.remove('userEmail');
     prefs.remove('userId');
+  }
 
-
+  void setAuthTimeout(int time) {
+    Timer(Duration(seconds: time), logout);
   }
 
   User get user {
