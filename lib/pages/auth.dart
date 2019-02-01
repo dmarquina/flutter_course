@@ -81,7 +81,7 @@ class _AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _submitForm(Function authemticate) async {
+  void _submitForm(Function authenticate) async {
     if (!_formKey.currentState.validate()) {
       return;
     }
@@ -90,9 +90,9 @@ class _AuthPageState extends State<AuthPage> {
     }
     _formKey.currentState.save();
     Map<String, dynamic> successInformation;
-    successInformation = await authemticate(_formData['email'], _formData['password'], _authMode);
+    successInformation = await authenticate(_formData['email'], _formData['password'], _authMode);
     if (successInformation['success']) {
-      Navigator.pushReplacementNamed(context, '/products');
+//      Navigator.pushReplacementNamed(context, '/');
     } else {
       showDialog(
           context: context,
