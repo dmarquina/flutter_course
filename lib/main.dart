@@ -6,9 +6,11 @@ import 'package:flutter_course/pages/products.dart';
 import 'package:flutter_course/pages/products_admin.dart';
 import 'package:flutter_course/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:map_view/map_view.dart';
 
 void main() {
 //  debugPaintSizeEnabled = true;
+  MapView.setApiKey('AIzaSyCIHplniutEkX2Yn8Ee8G01ASJduOmHnxo');
   runApp(MyApp());
 }
 
@@ -36,7 +38,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    print('holiii');
     return ScopedModel<MainModel>(
       model: _model,
       child: MaterialApp(

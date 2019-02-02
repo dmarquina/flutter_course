@@ -135,7 +135,8 @@ mixin ProductsModel on ConnectedProductsModel {
     ;
   }
 
-  Future<Null> fetchProducts() {
+  Future<Null> fetchProducts({onlyForUser = false}) {
+    _products.clear();
     _isLoading = true;
     notifyListeners();
     return http
@@ -143,6 +144,7 @@ mixin ProductsModel on ConnectedProductsModel {
             'https://flutter-products-cec1d.firebaseio.com/products.json?auth=${_authenticatedUser.token}')
         .then<Null>((res) {
       final List<Product> fetchedProductList = [];
+      print(res.body);
       final Map<String, dynamic> productListData = json.decode(res.body);
       if (productListData == null) {
         _isLoading = false;
@@ -150,15 +152,37 @@ mixin ProductsModel on ConnectedProductsModel {
         return;
       }
       productListData.forEach((String productId, dynamic productData) {
-        final Product product = Product(
-            id: productId,
-            title: productData['title'],
-            description: productData['description'],
-            image: productData['image'],
-            price: productData['price'],
-            userEmail: productData['userEmail'],
-            userId: productData['userId']);
-        fetchedProductList.add(product);
+        if (onlyForUser) {
+          if (productData['userId'] == _authenticatedUser.id) {
+            final Product product = Product(
+                id: productId,
+                title: productData['title'],
+                description: productData['description'],
+                image: productData['image'],
+                price: productData['price'],
+                userEmail: productData['userEmail'],
+                userId: productData['userId'],
+                isFavorite: productData['wishlistUsers'] != null
+                    ? (productData['wishlistUsers'] as Map<String, dynamic>)
+                    .containsKey(_authenticatedUser.id)
+                    : false);
+            fetchedProductList.add(product);
+          }
+        }else {
+          final Product product = Product(
+              id: productId,
+              title: productData['title'],
+              description: productData['description'],
+              image: productData['image'],
+              price: productData['price'],
+              userEmail: productData['userEmail'],
+              userId: productData['userId'],
+              isFavorite: productData['wishlistUsers'] != null
+                  ? (productData['wishlistUsers'] as Map<String, dynamic>)
+                      .containsKey(_authenticatedUser.id)
+                  : false);
+          fetchedProductList.add(product);
+        }
       });
       _products = fetchedProductList;
       _isLoading = false;
@@ -184,7 +208,7 @@ mixin ProductsModel on ConnectedProductsModel {
     return _showFavorites;
   }
 
-  void toggleProductFavoriteStatus() {
+  void toggleProductFavoriteStatus() async {
     final bool isCurrentlyFavorite = _products[selectedProductIndex].isFavorite;
     final bool newFavoriteStatus = !isCurrentlyFavorite;
     final Product updatedProduct = Product(
@@ -199,6 +223,29 @@ mixin ProductsModel on ConnectedProductsModel {
     );
     _products[selectedProductIndex] = updatedProduct;
     notifyListeners();
+    http.Response response;
+    if (newFavoriteStatus) {
+      response = await http.put(
+          'https://flutter-products-cec1d.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}',
+          body: json.encode(true));
+    } else {
+      response = await http.delete(
+          'https://flutter-products-cec1d.firebaseio.com/products/${selectedProduct.id}/wishlistUsers/${_authenticatedUser.id}.json?auth=${_authenticatedUser.token}');
+    }
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      final Product updatedProduct = Product(
+        id: selectedProduct.id,
+        title: selectedProduct.title,
+        description: selectedProduct.description,
+        price: selectedProduct.price,
+        image: selectedProduct.image,
+        userId: selectedProduct.userId,
+        userEmail: selectedProduct.userEmail,
+        isFavorite: !newFavoriteStatus,
+      );
+      _products[selectedProductIndex] = updatedProduct;
+      notifyListeners();
+    }
   }
 
   void selectProduct(String productId) {
@@ -296,9 +343,9 @@ mixin UserModel on ConnectedProductsModel {
   }
 
   void logout() async {
-    print('logout');
     _authenticatedUser = null;
     _authTimer.cancel();
+    _userSubject.add(false);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('token');
     prefs.remove('userEmail');
@@ -306,10 +353,7 @@ mixin UserModel on ConnectedProductsModel {
   }
 
   void setAuthTimeout(int time) {
-    _authTimer = Timer(Duration(milliseconds: time), (){
-      logout();
-      _userSubject.add(false);
-    });
+    _authTimer = Timer(Duration(seconds: time), logout);
   }
 
   User get user {
