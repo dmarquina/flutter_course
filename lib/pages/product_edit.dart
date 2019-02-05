@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_course/models/location_data.dart';
+import 'package:flutter_course/widgets/form_inputs/image.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../models/product.dart';
@@ -119,6 +120,10 @@ class _ProductEditPageState extends State<ProductEditPage> {
                 height: 10.0,
               ),
               LocationInput(_setLocation, product),
+              SizedBox(
+                height: 10.0,
+              ),
+              ImageInput(),
               SizedBox(
                 height: 10.0,
               ),

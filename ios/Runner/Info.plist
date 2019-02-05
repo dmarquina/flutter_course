@@ -26,11 +26,18 @@
     <string>Your location is required for xyz benefits for you</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Your location is required for xyz benefits for you</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Your camera1 is required for xyz benefits for you</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Your camera2 is required for xyz benefits for you</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Your camera3 is required for xyz benefits for you</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
+
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
