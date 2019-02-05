@@ -1,13 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter_course/models/location_data.dart';
 import 'package:flutter_course/models/product.dart';
 import 'package:flutter_course/models/user.dart';
 import 'package:http/http.dart' as http;
-import 'package:scoped_model/scoped_model.dart';
-import 'dart:async';
-import '../models/auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/auth.dart';
 
 mixin ConnectedProductsModel on Model {
   List<Product> _products = [];
@@ -38,7 +40,8 @@ mixin ProductsModel on ConnectedProductsModel {
     return _selProductId;
   }
 
-  Future<bool> addProduct(String title, String description, String image, double price) async {
+  Future<bool> addProduct(
+      String title, String description, String image, double price, LocationData locData) async {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> productData = {
@@ -47,7 +50,10 @@ mixin ProductsModel on ConnectedProductsModel {
       'image': 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Chocolate.jpg',
       'price': price,
       'userEmail': _authenticatedUser.email,
-      'userId': _authenticatedUser.id
+      'userId': _authenticatedUser.id,
+      'loc_lat': locData.latitude,
+      'loc_lng': locData.longitude,
+      'loc_address': locData.address
     };
     try {
       final http.Response res = await http.post(
@@ -66,6 +72,7 @@ mixin ProductsModel on ConnectedProductsModel {
           description: description,
           price: price,
           image: image,
+          location: locData,
           userEmail: _authenticatedUser.email,
           userId: _authenticatedUser.id);
       _products.add(newProduct);
@@ -79,7 +86,7 @@ mixin ProductsModel on ConnectedProductsModel {
     }
   }
 
-  Future<bool> updateProduct(String title, String description, String image, double price) {
+  Future<bool> updateProduct(String title, String description, String image, double price, LocationData locData) {
     _isLoading = true;
     notifyListeners();
     final Map<String, dynamic> updateData = {
@@ -87,6 +94,9 @@ mixin ProductsModel on ConnectedProductsModel {
       'description': description,
       'image': 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Chocolate.jpg',
       'price': price,
+      'loc_lat': locData.latitude,
+      'loc_lng': locData.longitude,
+      'loc_address': locData.address,
       'userEmail': selectedProduct.userEmail,
       'userId': selectedProduct.userId,
     };
@@ -101,6 +111,7 @@ mixin ProductsModel on ConnectedProductsModel {
           description: description,
           price: price,
           image: image,
+          location: locData,
           userEmail: selectedProduct.userEmail,
           userId: selectedProduct.userId);
       _products[selectedProductIndex] = updateProduct;
@@ -160,21 +171,29 @@ mixin ProductsModel on ConnectedProductsModel {
                 description: productData['description'],
                 image: productData['image'],
                 price: productData['price'],
+                location: LocationData(
+                    address: productData['loc_address'],
+                    latitude: productData['loc_lat'],
+                    longitude: productData['loc_lng']),
                 userEmail: productData['userEmail'],
                 userId: productData['userId'],
                 isFavorite: productData['wishlistUsers'] != null
                     ? (productData['wishlistUsers'] as Map<String, dynamic>)
-                    .containsKey(_authenticatedUser.id)
+                        .containsKey(_authenticatedUser.id)
                     : false);
             fetchedProductList.add(product);
           }
-        }else {
+        } else {
           final Product product = Product(
               id: productId,
               title: productData['title'],
               description: productData['description'],
               image: productData['image'],
               price: productData['price'],
+              location: LocationData(
+                  address: productData['loc_address'],
+                  latitude: productData['loc_lat'],
+                  longitude: productData['loc_lng']),
               userEmail: productData['userEmail'],
               userId: productData['userId'],
               isFavorite: productData['wishlistUsers'] != null
@@ -217,6 +236,7 @@ mixin ProductsModel on ConnectedProductsModel {
       description: selectedProduct.description,
       price: selectedProduct.price,
       image: selectedProduct.image,
+      location: selectedProduct.location,
       userId: selectedProduct.userId,
       userEmail: selectedProduct.userEmail,
       isFavorite: newFavoriteStatus,
@@ -239,6 +259,7 @@ mixin ProductsModel on ConnectedProductsModel {
         description: selectedProduct.description,
         price: selectedProduct.price,
         image: selectedProduct.image,
+        location: selectedProduct.location,
         userId: selectedProduct.userId,
         userEmail: selectedProduct.userEmail,
         isFavorite: !newFavoriteStatus,
@@ -250,6 +271,9 @@ mixin ProductsModel on ConnectedProductsModel {
 
   void selectProduct(String productId) {
     _selProductId = productId;
+    if (productId == null) {
+      return;
+    }
     notifyListeners();
   }
 

@@ -71,7 +71,7 @@ class ProductCard extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 _buildTitlePriceRow(),
-                AddressTag('Calle Buenos Aires, Stone Bridge'),
+                LocationTag(product.location),
                 Text(product.userEmail),
                 _buildActionButtons(context),
               ],

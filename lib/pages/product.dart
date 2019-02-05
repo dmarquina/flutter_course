@@ -84,7 +84,7 @@ class ProductPage extends StatelessWidget {
                       child: _buildTitlePriceRow(product.title, product.price.toString())),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 0.0),
-                    child: AddressTag('Calle Buenos Aires, Stone Bridge'),
+                    child: LocationTag(product.location),
                   ),
                   SizedBox(
                     height: 8.0,
